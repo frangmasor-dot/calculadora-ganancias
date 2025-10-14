@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#FF00FF">
+    <title>Calculadora de Ganancias v1.0</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .container {
+            background: white;
+            border: 4px solid #FF00FF;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 100%;
+        }
+
+        h1 {
+            font-family: 'Arial Black', sans-serif;
+            color: #FF00FF;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 10px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+        }
+
+        .checkbox-container label {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        label {
+            font-family: 'Arial Black', sans-serif;
+            color: #333;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+            color: black;
+            background: white;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #FF00FF;
+        }
+
+        input[type="text"]:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .message {
+            font-family: 'Arial Black', sans-serif;
+            color: #00AA00;
+            text-align: center;
+            font-size: 16px;
+            margin-top: 10px;
+            min-height: 25px;
+            font-weight: bold;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-family: 'Arial Black', sans-serif;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-clear {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-exit {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-exit:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .version {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .form-group {
+                grid-template-columns: 100px 1fr;
+                gap: 10px;
+            }
+
+            label {
+                font-size: 12px;
+            }
+
+            input[type="text"] {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            button {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 350px) {
+            .form-group {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            label {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 Calculadora de Ganancias</h1>
+
+        <div class="checkbox-container">
+            <input type="checkbox" id="opcion" onchange="calcular()">
+            <label for="opcion">Opción</label>
+        </div>
+
+        <div class="form-group">
+            <label for="costo">Costo:</label>
+            <input type="text" id="costo" placeholder="0.00" onkeypress="return handleEnter(event, 'venta')" oninput="calcular()">
+        </div>
+
+        <div class="form-group">
+            <label for="venta">Venta:</label>
+            <input type="text" id="venta" placeholder="0.00" oninput="calcular()">
+        </div>
+
+        <div class="form-group">
+            <label for="gananciaDolares">Ganan $:</label>
+            <input type="text" id="gananciaDolares" placeholder="0.00" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="gananciaPorcentaje">Ganan %:</label>
+            <input type="text" id="gananciaPorcentaje" placeholder="0.00%" disabled>
+        </div>
+
+        <div class="message" id="mensaje"></div>
+
+        <div class="button-container">
+            <button class="btn-clear" onclick="limpiar()">🔄 Limpiar</button>
+            <button class="btn-exit" onclick="salir()">❌ Salir</button>
+        </div>
+
+        <div class="version">v1.0 - 2025</div>
+    </div>
+
+    <script>
+        function formatearNumero(valor) {
+            valor = valor.replace(/[^\d.]/g, '');
+            
+            const partes = valor.split('.');
+            if (partes.length > 2) {
+                valor = partes[0] + '.' + partes.slice(1).join('');
+            }
+            
+            return valor;
+        }
+
+        function formatearMostrar(numero) {
+            if (numero === '' || numero === null || isNaN(numero)) {
+                return '';
+            }
+            
+            const num = parseFloat(numero);
+            return num.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function obtenerValor(id) {
+            const input = document.getElementById(id);
+            const valor = input.value.replace(/,/g, '');
+            return valor === '' ? '' : parseFloat(valor);
+        }
+
+        function handleEnter(event, siguienteId) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                document.getElementById(siguienteId).focus();
+                return false;
+            }
+            return true;
+        }
+
+        document.getElementById('costo').addEventListener('input', function(e) {
+            const cursorPos = e.target.selectionStart;
+            const valorAnterior = e.target.value;
+            
+            e.target.value = formatearNumero(e.target.value);
+            
+            if (valorAnterior !== e.target.value) {
+                e.target.setSelectionRange(cursorPos, cursorPos);
+            }
+        });
+
+        document.getElementById('venta').addEventListener('input', function(e) {
+            const cursorPos = e.target.selectionStart;
+            const valorAnterior = e.target.value;
+            
+            e.target.value = formatearNumero(e.target.value);
+            
+            if (valorAnterior !== e.target.value) {
+                e.target.setSelectionRange(cursorPos, cursorPos);
+            }
+        });
+
+        document.getElementById('costo').addEventListener('blur', function(e) {
+            const valor = obtenerValor('costo');
+            if (valor !== '') {
+                e.target.value = formatearMostrar(valor);
+            }
+        });
+
+        document.getElementById('venta').addEventListener('blur', function(e) {
+            const valor = obtenerValor('venta');
+            if (valor !== '') {
+                e.target.value = formatearMostrar(valor);
+            }
+        });
+
+        document.getElementById('costo').addEventListener('focus', function(e) {
+            const valor = e.target.value.replace(/,/g, '');
+            if (valor !== '') {
+                e.target.value = valor;
+                e.target.select();
+            }
+        });
+
+        document.getElementById('venta').addEventListener('focus', function(e) {
+            const valor = e.target.value.replace(/,/g, '');
+            if (valor !== '') {
+                e.target.value = valor;
+                e.target.select();
+            }
+        });
+
+        function calcular() {
+            const opcion = document.getElementById('opcion').checked;
+            const costo = obtenerValor('costo');
+            const venta = obtenerValor('venta');
+            
+            const gananciaDolaresInput = document.getElementById('gananciaDolares');
+            const gananciaPorcentajeInput = document.getElementById('gananciaPorcentaje');
+            const mensaje = document.getElementById('mensaje');
+
+            if (costo === '' || venta === '') {
+                gananciaDolaresInput.value = '';
+                gananciaPorcentajeInput.value = '';
+                mensaje.textContent = '';
+                return;
+            }
+
+            let gananciaDolares;
+            let gananciaPorcentaje;
+
+            if (opcion) {
+                const impuestoVenta = (venta / 1.13) * 0.13;
+                const impuestoCosto = (costo / 1.13) * 0.13;
+                gananciaDolares = venta - (costo + impuestoVenta - impuestoCosto);
+                
+                const costoConImpuesto = costo + impuestoVenta - impuestoCosto;
+                gananciaPorcentaje = (1 - (costoConImpuesto / venta)) * 100;
+            } else {
+                gananciaDolares = venta - costo;
+                gananciaPorcentaje = (gananciaDolares / costo) * 100;
+            }
+
+            gananciaDolaresInput.value = formatearMostrar(gananciaDolares);
+            gananciaPorcentajeInput.value = formatearMostrar(gananciaPorcentaje) + '%';
+
+            if (opcion) {
+                mensaje.textContent = '';
+            } else {
+                mensaje.textContent = 'Correcto !';
+            }
+        }
+
+        function limpiar() {
+            document.getElementById('costo').value = '';
+            document.getElementById('venta').value = '';
+            document.getElementById('gananciaDolares').value = '';
+            document.getElementById('gananciaPorcentaje').value = '';
+            document.getElementById('mensaje').textContent = '';
+            document.getElementById('opcion').checked = false;
+            document.getElementById('costo').focus();
+        }
+
+        function salir() {
+            if (confirm('¿Está seguro que desea salir?')) {
+                window.close();
+                
+                if (!window.closed) {
+                    window.location.href = 'about:blank';
+                }
+            }
+        }
+
+        window.addEventListener('load', function() {
+            document.getElementById('costo').focus();
+        });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(function(err) {
+                console.log('Service Worker registration failed:', err);
+            });
+        }
+    </script>
+</body>
+</html>
